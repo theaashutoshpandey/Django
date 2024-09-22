@@ -1,0 +1,49 @@
+ Django signals do not run in the same database transaction as the caller. This means that if a signal handler raises an exception, it will not roll back the transaction of the caller.
+
+Models.py
+
+from django.db import models
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=255)
+
+
+Signals.py
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.db import transaction
+
+@receiver(post_save, sender=MyModel)
+def my_signal_handler(sender, instance, **kwargs):
+    raise RuntimeError("Error in signal handler")
+
+
+Views.py
+
+
+from django.db import transaction
+from .models import MyModel
+from .signals import my_signal_handler
+
+def my_view():
+    try:
+        with transaction.atomic():
+            my_obj = MyModel(name="Test")
+            my_obj.save()  # This will trigger the signal
+            print("Transaction is still active")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+We create a model called MyModel in our models.py file. This is a simple model with a name field.
+
+Next, we define a signal handler called my_signal_handler in our signals.py file. This handler will raise an error when it's triggered.
+
+In our views.py file, we define a view called my_view. This view creates a new instance of MyModel and saves it, which triggers the signal.
+
+We use a try-except block to catch any exceptions raised by the signal handler. This means that if the signal handler raises an error, we can catch it and handle it.
+
+Here's the important part: if the signal handler raises an error, the transaction in my_view will still be active, and the print statement will be executed. This shows that the signal handler runs in a separate transaction from the caller.
+
+If we want the signal handler to run in the same transaction as the caller, we can use the transaction.on_commit function to register a callback that will be executed when the transaction is committed.
