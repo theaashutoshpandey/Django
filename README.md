@@ -1,2 +1,3 @@
 # Django
 this is the django trainee assignment for the second round of my Selection.....
+ QUESTION 1 - By default, Django signals are executed synchronously. This means that when a signal is sent, the code that triggered the signal will wait for all connected receivers to finish executing before continuing.
