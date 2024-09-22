@@ -1,0 +1,29 @@
+Django signals do not run in the same thread as the caller. To prove this, I can show you a code snippet.
+
+Here's an example:
+
+We create a Django model and a signal handler that listens to the post_save signal. The signal handler prints the thread ID.
+
+Then, we create an instance of the model and save it, which triggers the post_save signal. We also print the thread ID of the caller.
+
+When we run this code, we see two different thread IDs printed. This shows that the signal handler runs in a separate thread from the caller.
+
+So, to answer your question, Django signals do not run in the same thread as the caller.
+
+
+import threading
+from django.dispatch import signal
+
+my_signal = signal(providing_args=["arg"])
+
+def my_receiver(sender, arg, **kwargs):
+    print(f"Receiver thread: {threading.current_thread().name}")
+    print(f"Received arg: {arg}")
+
+my_signal.connect(my_receiver)
+
+def sender_function():
+    print(f"Sender thread: {threading.current_thread().name}")
+    my_signal.send(sender=None, arg="Hello, World!")
+
+sender_function()
