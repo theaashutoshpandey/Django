@@ -1,0 +1,61 @@
+To create a Rectangle class that meets the specified requirements, we can define a custom class with an __init__ method to initialize the length and width, and an __iter__ method to enable iteration over the instance.
+
+
+class Rectangle:
+    def __init__(self, length: int, width: int):
+        self.length = length
+        self.width = width
+
+    def __iter__(self):
+        yield {'length': self.length}
+        yield {'width': self.width}
+
+
+Let me explain what's going on here:
+
+The __init__ method is a special method in Python that's called when an instance of the class is created. It takes two arguments, length and width, which are assigned to instance variables self.length and self.width, respectively.
+The __iter__ method is another special method that's called when an instance of the class is iterated over (e.g., using a for loop). It's a generator function that yields two dictionaries: one with the key 'length' and the value of self.length, and another with the key 'width' and the value of self.width.
+With this implementation, we can create an instance of the Rectangle class and iterate over it like this:
+
+
+rect = Rectangle(4, 5)
+for item in rect:
+    print(item)
+
+output 
+
+{'length': 4}
+{'width': 5}
+
+
+
+3- 
+class Rectangle:
+    def __init__(self, length, width):
+        self.length = length
+        self.width = width
+        self.attributes = ['length', 'width']
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index < len(self.attributes):
+            attr = self.attributes[self.index]
+            value = getattr(self, attr)
+            self.index += 1
+            return {attr: value}
+        raise StopIteration
+
+# Example usage:
+rect = Rectangle(5, 3)
+for attr in rect:
+    print(attr)
+
+
+
+output -
+
+{'length': 5}
+{'width': 3}
